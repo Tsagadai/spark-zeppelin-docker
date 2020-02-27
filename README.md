@@ -1,24 +1,21 @@
 # Purpose 
 
 This docker image provides a local *spark* installation with *zeppelin* and a running *spark-history-server*.
-It is uploaded in [dockerhub](https://hub.docker.com/r/mirkoprescha/spark-zeppelin-docker/) in a public repository.
-
-I use it to evaluate independently spark code in a more convenient way then a spark-shell.
 
 ## Components
 - Spark version="2.4.3"
-- Zeppelin version="0.8.1"
+- Zeppelin version="0.8.2"
 - Hadoop version="2.7"
  
 ## Start the container
 ```
-  docker run -it -p 18080:18080 -p 8088:8080 -d mirkoprescha/spark-zeppelin-docker
+  docker run -it -p 18080:18080 -p 8088:8080 -d tsagadai/spark-zeppelin-docker
 ```
 
 ## Open Zeppelin and Spark History Server  
 
 In your local browser 
-- Zeppelin: http://localhost:8088/#/
+- Zeppelin: http://localhost:8888/#/
 - Spark History Server: http://localhost:18080/?showIncomplete=true
 
 Probably, you have to wait roughly 10 second until zeppelin daemon has been started, right after starting the container.
@@ -52,12 +49,12 @@ spark-submit   --class <your-class-name-with-package> \
  
 After changes in `Dockerfile` goto project home dir and run
 ```
-docker build  -t mirkoprescha/spark-zeppelin-docker .
+docker build  -t tsagadai/spark-zeppelin-docker .
 ```
 
 This repo is connected to an automated build in docker hub, so the following *no push* to docker hub is not required.
 ```
-docker push  mirkoprescha/spark-zeppelin-docker
+docker push  tsagadai/spark-zeppelin-docker
 ```
 
 
