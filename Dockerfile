@@ -1,10 +1,10 @@
 FROM ubuntu:18.04
 
 ARG ZEPPELIN_VERSION="0.8.2"
-ARG SPARK_VERSION="2.3.4"
+ARG SPARK_VERSION="2.4.7"
 ARG HADOOP_VERSION="2.7"
 
-LABEL maintainer "tsagadai"
+LABEL maintainer="tsagadai"
 LABEL zeppelin.version=${ZEPPELIN_VERSION}
 LABEL spark.version=${SPARK_VERSION}
 LABEL hadoop.version=${HADOOP_VERSION}
@@ -17,7 +17,7 @@ RUN sed -i -e 's/http:\/\/archive/http:\/\/au.archive/' /etc/apt/sources.list
 # Install Java and some tools
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt update && apt upgrade -y && \
-    apt -q -y install curl less openjdk-8-jdk vim.nox wget ssh
+    apt -q -y install curl less openjdk-8-jdk vim.nox wget ssh git tmux
 
 
 ##########################################
@@ -29,7 +29,6 @@ ENV SPARK_HOME /usr/local/spark
 
 ENV PATH $PATH:${SPARK_HOME}/bin
 RUN wget -qO- http://apache.mirror.cdnetworks.com/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz | tar -xz -C  /usr/local/spark --strip-components=1
-
 COPY spark-defaults.conf ${SPARK_HOME}/conf/
 
 ##########################################
@@ -37,6 +36,24 @@ COPY spark-defaults.conf ${SPARK_HOME}/conf/
 ##########################################
 RUN mkdir /usr/zeppelin &&\
     wget -qO- http://apache.mirror.cdnetworks.com/zeppelin/zeppelin-${ZEPPELIN_VERSION}/zeppelin-${ZEPPELIN_VERSION}-bin-all.tgz | tar -xz -C /usr/zeppelin
+
+##########################################
+#Sedona
+##########################################
+RUN wget -qO- https://www.strategylions.com.au/mirror/incubator/sedona/1.0.0-incubating/apache-sedona-1.0.0-incubating-bin.tar.gz | tar -xz -C  /usr/local/spark/jars/
+RUN git clone https://github.com/apache/incubator-sedona.git /usr/incubator-sedona
+RUN mkdir -p /usr/zeppelin/zeppelin-${ZEPPELIN_VERSION}-bin-all/helium && echo $'{\n\
+  "type": "VISUALIZATION",\n\
+  "name": "sedona-zeppelin",\n\
+  "description": "Zeppelin visualization support for Sedona",\n\
+  "artifact": "/usr/incubator-sedona/zeppelin",\n\
+  "license": "BSD-2-Clause",\n\
+  "icon": "<i class='fa fa-globe'></i>"\n\
+}' > /usr/zeppelin/zeppelin-${ZEPPELIN_VERSION}-bin-all/helium/sedona-zeppelin.json
+
+##########################################
+# More Zeppelin
+##########################################
 RUN echo '{ "allow_root": true }' > /root/.bowerrc
 
 ENV ZEPPELIN_PORT 8888
